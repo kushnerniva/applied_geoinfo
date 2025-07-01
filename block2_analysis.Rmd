@@ -8,19 +8,105 @@ output: html_notebook
 library(terra)
 library(tidyverse)
 library(tidyterra)
+library(sf)
 ```
 
 ```{r}
-wgbt2020_2011 <- rast("~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output/WBGT_dayover28_2011_2020_present.tif")
+# upload raster files
+wbgt_files <- list.files("~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output",
+                         pattern = "^WBGT_dayover28.*\\.tif$",
+                         full.names = T)
 
-wgbt2021_2030 <- rast("~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output/WBGT_dayover28_2011_2020_present.tif")
+# create raster stack
+wbgt_stack <- rast(wbgt_files)
 
-wgbt2020_2011 <- rast("~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output/WBGT_dayover28_2011_2020_present.tif")
-wgbt2020_2011 <- rast("~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output/WBGT_dayover28_2011_2020_present.tif")
+# rename layer
+wbgt_names <- names(wbgt_stack)
+
+wbgt_names <- sapply(wbgt_names, function(name){ 
+  name <- gsub("^WBGT_dayover28_", "", name)
+  return(name)
+})
+
+names(wbgt_stack) <- wbgt_names
+
+# create data frame
+wbgt_df <- wbgt_stack %>%
+  as.data.frame(xy = T)
+
+# tidy df
+wbgt_df <- wbgt_df %>%
+  pivot_longer(cols = -c("x", "y"), 
+               names_to = "date",
+               values_to = "wet_bulb_temp")
+# generate plot
+wbgt_df %>%
+  group_by(date) %>%
+  summarize(mean_wbgt = mean(wet_bulb_temp)) %>%
+  ggplot(aes(x = date, y = mean_wbgt)) +
+  geom_point() +
+  theme_bw()
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r}
+# list t2m daily mean files
+t2m_dailymean_files <- list.files("~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output",
+                        pattern = "^T2M_daily_mean_max_topography.*\\.tif$",
+                        full.names = T)
+# create raster stack
+t2m_dailymean_stack <- rast(t2m_files)
+```
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+```{r}
+# list t2m nightover20 files
+t2m_nightover20_files <- list.files("~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output",
+                        pattern = "^T2M_nightover20.*\\.tif$",
+                        full.names = T)
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+# create raster stack
+t2m_nightover20_stack <- rast(t2m_nightover20_files)
+
+# rename raster layers
+t2m_nightover20_names <- names(t2m_nightover20_stack)
+
+t2m_nightover20_names <- sapply(t2m_nightover20_names, function(name){
+  name <- gsub("^T2M_nightover20_", "", name)
+  return(name)
+})
+
+names(t2m_nightover20_stack) <- t2m_nightover20_names
+
+# create df
+t2m_nightover20_df <- t2m_nightover20_stack %>%
+  as.data.frame(xy = T)
+
+# tidy df
+t2m_nightover20_df <- t2m_nightover20_df %>%
+  pivot_longer(cols = -c(x, y), names_to = "projection", values_to = "t2m") 
+
+## GREPL OPERATION
+
+# mutate duration variable
+t2m_nightover20_df <- t2m_nightover20_df %>%
+  mutate(duration = case_when(grepl("2041_2050", projection) ~ "2041_2050",
+                              grepl("2091_2100", projection) ~ "2091_2100"))
+
+# mutate scenario variable
+t2m_nightover20_df <- t2m_nightover20_df %>%
+  mutate(scenario = case_when(grepl("GS", projection) ~ "GS",
+                              grepl("CurPol", projection) ~ "CurPol"))
+
+# mutate ensemble variable
+t2m_nightover20_df <- t2m_nightover20_df %>%
+  mutate(ensemble = case_when(grepl("ensmean", projection) ~ "ensmean",
+                              grepl("enspctl05", projection) ~ "05",
+                              grepl("enspctl95", projection) ~ "95")) %>%
+  select(-c(x,y))
+
+```
+
+```{r}
+# create haphazard sample for easier computing
+t2m_sample <- t2m_nightover20_df[sample(1:nrow(t2m_nightover20_df), 50000), ]
+
+```

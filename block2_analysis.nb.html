@@ -1754,33 +1754,122 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2xvYWQgaW4gcGFja2FnZXNcbmxpYnJhcnkodGVycmEpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkodGlkeXRlcnJhKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2xvYWQgaW4gcGFja2FnZXNcbmxpYnJhcnkodGVycmEpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkodGlkeXRlcnJhKVxubGlicmFyeShzZilcbmBgYCJ9 -->
 <pre class="r"><code>#load in packages
 library(terra)
 library(tidyverse)
-library(tidyterra)</code></pre>
+library(tidyterra)
+library(sf)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2didDIwMjAgPC0gcmFzdChcIn4vR2xvYmFsIENoYW5nZSBHZW9ncmFwaHkgTVNjL1NvU2UgMjUvQXBwbGllZCBHZW9pbmZvcm1hdGlvbiBTY2llbmNlL0Jsb2NrMi9jbGltYXRlLW1vZGVsLW91dHB1dC9XQkdUX2RheW92ZXIyOF8yMDExXzIwMjBfcHJlc2VudC50aWZcIilcbmBgYCJ9 -->
-<pre class="r"><code>wgbt2020 &lt;- rast(&quot;~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output/WBGT_dayover28_2011_2020_present.tif&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB1cGxvYWQgcmFzdGVyIGZpbGVzXG53Ymd0X2ZpbGVzIDwtIGxpc3QuZmlsZXMoXCJ+L0dsb2JhbCBDaGFuZ2UgR2VvZ3JhcGh5IE1TYy9Tb1NlIDI1L0FwcGxpZWQgR2VvaW5mb3JtYXRpb24gU2NpZW5jZS9CbG9jazIvY2xpbWF0ZS1tb2RlbC1vdXRwdXRcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICBwYXR0ZXJuID0gXCJeV0JHVF9kYXlvdmVyMjguKlxcXFwudGlmJFwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgIGZ1bGwubmFtZXMgPSBUKVxuXG4jIGNyZWF0ZSByYXN0ZXIgc3RhY2tcbndiZ3Rfc3RhY2sgPC0gcmFzdCh3Ymd0X2ZpbGVzKVxuXG4jIHJlbmFtZSBsYXllclxud2JndF9uYW1lcyA8LSBuYW1lcyh3Ymd0X3N0YWNrKVxuXG53Ymd0X25hbWVzIDwtIHNhcHBseSh3Ymd0X25hbWVzLCBmdW5jdGlvbihuYW1lKXtcbiAgbmFtZSA8LSBnc3ViKFwiXldCR1RfZGF5b3ZlcjI4X1wiLCBcIlwiLCBuYW1lKVxuICByZXR1cm4obmFtZSlcbn0pXG5cbm5hbWVzKHdiZ3Rfc3RhY2spIDwtIHdiZ3RfbmFtZXNcblxuIyBjcmVhdGUgZGF0YSBmcmFtZVxud2JndF9kZiA8LSB3Ymd0X3N0YWNrICU+JVxuICBhcy5kYXRhLmZyYW1lKHh5ID0gVClcbmBgYCJ9 -->
+<pre class="r"><code># upload raster files
+wbgt_files &lt;- list.files(&quot;~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output&quot;,
+                         pattern = &quot;^WBGT_dayover28.*\\.tif$&quot;,
+                         full.names = T)
+
+# create raster stack
+wbgt_stack &lt;- rast(wbgt_files)
+
+# rename layer
+wbgt_names &lt;- names(wbgt_stack)
+
+wbgt_names &lt;- sapply(wbgt_names, function(name){
+  name &lt;- gsub(&quot;^WBGT_dayover28_&quot;, &quot;&quot;, name)
+  return(name)
+})
+
+names(wbgt_stack) &lt;- wbgt_names
+
+# create data frame
+wbgt_df &lt;- wbgt_stack %&gt;%
+  as.data.frame(xy = T)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Add a new chunk by clicking the <em>Insert Chunk</em> button on the
-toolbar or by pressing <em>Ctrl+Alt+I</em>.</p>
-<p>When you save the notebook, an HTML file containing the code and
-output will be saved alongside it (click the <em>Preview</em> button or
-press <em>Ctrl+Shift+K</em> to preview the HTML file).</p>
-<p>The preview shows you a rendered HTML copy of the contents of the
-editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not
-run any R code chunks. Instead, the output of the chunk when it was last
-run in the editor is displayed.</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudDJtX2RhaWx5bWVhbl9maWxlcyA8LSBsaXN0LmZpbGVzKFwifi9HbG9iYWwgQ2hhbmdlIEdlb2dyYXBoeSBNU2MvU29TZSAyNS9BcHBsaWVkIEdlb2luZm9ybWF0aW9uIFNjaWVuY2UvQmxvY2syL2NsaW1hdGUtbW9kZWwtb3V0cHV0XCIsXG4gICAgICAgICAgICAgICAgICAgICAgICBwYXR0ZXJuID0gXCJeVDJNX2RhaWx5X21lYW5fbWF4X3RvcG9ncmFwaHkuKlxcXFwudGlmJFwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgZnVsbC5uYW1lcyA9IFQpXG5cbnQybV9kYWlseW1lYW5fc3RhY2sgPC0gcmFzdCh0Mm1fZmlsZXMpXG5gYGAifQ== -->
+<pre class="r"><code>t2m_dailymean_files &lt;- list.files(&quot;~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output&quot;,
+                        pattern = &quot;^T2M_daily_mean_max_topography.*\\.tif$&quot;,
+                        full.names = T)
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCiNsb2FkIGluIHBhY2thZ2VzDQpsaWJyYXJ5KHRlcnJhKQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KHRpZHl0ZXJyYSkNCmBgYA0KDQpgYGB7cn0NCndnYnQyMDIwXzIwMTEgPC0gcmFzdCgifi9HbG9iYWwgQ2hhbmdlIEdlb2dyYXBoeSBNU2MvU29TZSAyNS9BcHBsaWVkIEdlb2luZm9ybWF0aW9uIFNjaWVuY2UvQmxvY2syL2NsaW1hdGUtbW9kZWwtb3V0cHV0L1dCR1RfZGF5b3ZlcjI4XzIwMTFfMjAyMF9wcmVzZW50LnRpZiIpDQoNCndnYnQyMDIxXzIwMzAgPC0gcmFzdCgifi9HbG9iYWwgQ2hhbmdlIEdlb2dyYXBoeSBNU2MvU29TZSAyNS9BcHBsaWVkIEdlb2luZm9ybWF0aW9uIFNjaWVuY2UvQmxvY2syL2NsaW1hdGUtbW9kZWwtb3V0cHV0L1dCR1RfZGF5b3ZlcjI4XzIwMTFfMjAyMF9wcmVzZW50LnRpZiIpDQoNCndnYnQyMDIwXzIwMTEgPC0gcmFzdCgifi9HbG9iYWwgQ2hhbmdlIEdlb2dyYXBoeSBNU2MvU29TZSAyNS9BcHBsaWVkIEdlb2luZm9ybWF0aW9uIFNjaWVuY2UvQmxvY2syL2NsaW1hdGUtbW9kZWwtb3V0cHV0L1dCR1RfZGF5b3ZlcjI4XzIwMTFfMjAyMF9wcmVzZW50LnRpZiIpDQp3Z2J0MjAyMF8yMDExIDwtIHJhc3QoIn4vR2xvYmFsIENoYW5nZSBHZW9ncmFwaHkgTVNjL1NvU2UgMjUvQXBwbGllZCBHZW9pbmZvcm1hdGlvbiBTY2llbmNlL0Jsb2NrMi9jbGltYXRlLW1vZGVsLW91dHB1dC9XQkdUX2RheW92ZXIyOF8yMDExXzIwMjBfcHJlc2VudC50aWYiKQ0KYGBgDQoNCkFkZCBhIG5ldyBjaHVuayBieSBjbGlja2luZyB0aGUgKkluc2VydCBDaHVuayogYnV0dG9uIG9uIHRoZSB0b29sYmFyIG9yIGJ5IHByZXNzaW5nICpDdHJsK0FsdCtJKi4NCg0KV2hlbiB5b3Ugc2F2ZSB0aGUgbm90ZWJvb2ssIGFuIEhUTUwgZmlsZSBjb250YWluaW5nIHRoZSBjb2RlIGFuZCBvdXRwdXQgd2lsbCBiZSBzYXZlZCBhbG9uZ3NpZGUgaXQgKGNsaWNrIHRoZSAqUHJldmlldyogYnV0dG9uIG9yIHByZXNzICpDdHJsK1NoaWZ0K0sqIHRvIHByZXZpZXcgdGhlIEhUTUwgZmlsZSkuDQoNClRoZSBwcmV2aWV3IHNob3dzIHlvdSBhIHJlbmRlcmVkIEhUTUwgY29weSBvZiB0aGUgY29udGVudHMgb2YgdGhlIGVkaXRvci4gQ29uc2VxdWVudGx5LCB1bmxpa2UgKktuaXQqLCAqUHJldmlldyogZG9lcyBub3QgcnVuIGFueSBSIGNvZGUgY2h1bmtzLiBJbnN0ZWFkLCB0aGUgb3V0cHV0IG9mIHRoZSBjaHVuayB3aGVuIGl0IHdhcyBsYXN0IHJ1biBpbiB0aGUgZWRpdG9yIGlzIGRpc3BsYXllZC4NCg==</div>
+t2m_dailymean_stack &lt;- rast(t2m_files)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsaXN0IHQybSBuaWdodG92ZXIyMCBmaWxlc1xudDJtX25pZ2h0b3ZlcjIwX2ZpbGVzIDwtIGxpc3QuZmlsZXMoXCJ+L0dsb2JhbCBDaGFuZ2UgR2VvZ3JhcGh5IE1TYy9Tb1NlIDI1L0FwcGxpZWQgR2VvaW5mb3JtYXRpb24gU2NpZW5jZS9CbG9jazIvY2xpbWF0ZS1tb2RlbC1vdXRwdXRcIixcbiAgICAgICAgICAgICAgICAgICAgICAgIHBhdHRlcm4gPSBcIl5UMk1fbmlnaHRvdmVyMjAuKlxcXFwudGlmJFwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgZnVsbC5uYW1lcyA9IFQpXG5cbiMgY3JlYXRlIHJhc3RlciBzdGFja1xudDJtX25pZ2h0b3ZlcjIwX3N0YWNrIDwtIHJhc3QodDJtX25pZ2h0b3ZlcjIwX2ZpbGVzKVxuXG4jIHJlbmFtZSByYXN0ZXIgbGF5ZXJzXG50Mm1fbmlnaHRvdmVyMjBfbmFtZXMgPC0gbmFtZXModDJtX25pZ2h0b3ZlcjIwX3N0YWNrKVxuXG50Mm1fbmlnaHRvdmVyMjBfbmFtZXMgPC0gc2FwcGx5KHQybV9uaWdodG92ZXIyMF9uYW1lcywgZnVuY3Rpb24obmFtZSl7XG4gIG5hbWUgPC0gZ3N1YihcIl5UMk1fbmlnaHRvdmVyMjBfXCIsIFwiXCIsIG5hbWUpXG4gIHJldHVybihuYW1lKVxufSlcblxubmFtZXModDJtX25pZ2h0b3ZlcjIwX3N0YWNrKSA8LSB0Mm1fbmlnaHRvdmVyMjBfbmFtZXNcblxuIyBjcmVhdGUgZGZcbnQybV9uaWdodG92ZXIyMF9kZiA8LSB0Mm1fbmlnaHRvdmVyMjBfc3RhY2sgJT4lXG4gIGFzLmRhdGEuZnJhbWUoeHkgPSBUKVxuXG4jIHRpZHkgZGZcbnQybV9uaWdodG92ZXIyMF9kZiA8LSB0Mm1fbmlnaHRvdmVyMjBfZGYgJT4lXG4gIHBpdm90X2xvbmdlcihjb2xzID0gLWMoeCwgeSksIG5hbWVzX3RvID0gXCJwcm9qZWN0aW9uXCIsIHZhbHVlc190byA9IFwidDJtXCIpIFxuXG4jIyBHUkVQTCBPUEVSQVRJT05cblxuIyBtdXRhdGUgZHVyYXRpb24gdmFyaWFibGVcbnQybV9uaWdodG92ZXIyMF9kZiA8LSB0Mm1fbmlnaHRvdmVyMjBfZGYgJT4lXG4gIG11dGF0ZShkdXJhdGlvbiA9IGNhc2Vfd2hlbihncmVwbChcIjIwNDFfMjA1MFwiLCBwcm9qZWN0aW9uKSB+IFwiMjA0MV8yMDUwXCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBncmVwbChcIjIwOTFfMjEwMFwiLCBwcm9qZWN0aW9uKSB+IFwiMjA5MV8yMTAwXCIpKVxuXG4jIG11dGF0ZSBzY2VuYXJpbyB2YXJpYWJsZVxudDJtX25pZ2h0b3ZlcjIwX2RmIDwtIHQybV9uaWdodG92ZXIyMF9kZiAlPiVcbiAgbXV0YXRlKHNjZW5hcmlvID0gY2FzZV93aGVuKGdyZXBsKFwiR1NcIiwgcHJvamVjdGlvbikgfiBcIkdTXCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBncmVwbChcIkN1clBvbFwiLCBwcm9qZWN0aW9uKSB+IFwiQ3VyUG9sXCIpKVxuXG4jIG11dGF0ZSBlbnNlbWJsZSB2YXJpYWJsZVxudDJtX25pZ2h0b3ZlcjIwX2RmIDwtIHQybV9uaWdodG92ZXIyMF9kZiAlPiVcbiAgbXV0YXRlKGVuc2VtYmxlID0gY2FzZV93aGVuKGdyZXBsKFwiZW5zbWVhblwiLCBwcm9qZWN0aW9uKSB+IFwiZW5zbWVhblwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ3JlcGwoXCJlbnNwY3RsMDVcIiwgcHJvamVjdGlvbikgfiBcIjA1XCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBncmVwbChcImVuc3BjdGw5NVwiLCBwcm9qZWN0aW9uKSB+IFwiOTVcIikpICU+JVxuICBzZWxlY3QoLWMoeCx5KSlcblxuYGBgIn0= -->
+<pre class="r"><code># list t2m nightover20 files
+t2m_nightover20_files &lt;- list.files(&quot;~/Global Change Geography MSc/SoSe 25/Applied Geoinformation Science/Block2/climate-model-output&quot;,
+                        pattern = &quot;^T2M_nightover20.*\\.tif$&quot;,
+                        full.names = T)
+
+# create raster stack
+t2m_nightover20_stack &lt;- rast(t2m_nightover20_files)
+
+# rename raster layers
+t2m_nightover20_names &lt;- names(t2m_nightover20_stack)
+
+t2m_nightover20_names &lt;- sapply(t2m_nightover20_names, function(name){
+  name &lt;- gsub(&quot;^T2M_nightover20_&quot;, &quot;&quot;, name)
+  return(name)
+})
+
+names(t2m_nightover20_stack) &lt;- t2m_nightover20_names
+
+# create df
+t2m_nightover20_df &lt;- t2m_nightover20_stack %&gt;%
+  as.data.frame(xy = T)
+
+# tidy df
+t2m_nightover20_df &lt;- t2m_nightover20_df %&gt;%
+  pivot_longer(cols = -c(x, y), names_to = &quot;projection&quot;, values_to = &quot;t2m&quot;) 
+
+## GREPL OPERATION
+
+# mutate duration variable
+t2m_nightover20_df &lt;- t2m_nightover20_df %&gt;%
+  mutate(duration = case_when(grepl(&quot;2041_2050&quot;, projection) ~ &quot;2041_2050&quot;,
+                              grepl(&quot;2091_2100&quot;, projection) ~ &quot;2091_2100&quot;))
+
+# mutate scenario variable
+t2m_nightover20_df &lt;- t2m_nightover20_df %&gt;%
+  mutate(scenario = case_when(grepl(&quot;GS&quot;, projection) ~ &quot;GS&quot;,
+                              grepl(&quot;CurPol&quot;, projection) ~ &quot;CurPol&quot;))
+
+# mutate ensemble variable
+t2m_nightover20_df &lt;- t2m_nightover20_df %&gt;%
+  mutate(ensemble = case_when(grepl(&quot;ensmean&quot;, projection) ~ &quot;ensmean&quot;,
+                              grepl(&quot;enspctl05&quot;, projection) ~ &quot;05&quot;,
+                              grepl(&quot;enspctl95&quot;, projection) ~ &quot;95&quot;)) %&gt;%
+  select(-c(x,y))
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudDJtX25pZ2h0b3ZlcjIwX2RmICU+JSBcbiAgZ3JvdXBfYnkoZW5zZW1ibGUpICU+JVxuICBnZ3Bsb3QoYWVzKHggPSBlbnNlbWJsZSwgeSA9IHQybSkpICtcbiAgZ2VvbV9wbG90KCkgK1xuICB0aGVtZV9idygpXG5gYGAifQ== -->
+<pre class="r"><code>t2m_nightover20_df %&gt;% 
+  group_by(ensemble) %&gt;%
+  ggplot(aes(x = ensemble, y = t2m)) +
+  geom_plot() +
+  theme_bw()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXHUwMDFiRzE7XHUwMDFiSDE7RXJyb3JcdTAwMWJoIGluIGdlb21fcGxvdCgpIDogY291bGQgbm90IGZpbmQgZnVuY3Rpb24gXCJnZW9tX3Bsb3RcIlxuRXJyb3IgZHVyaW5nIHdyYXB1cDogbm90IHRoYXQgbWFueSBmcmFtZXMgb24gdGhlIHN0YWNrXG5cdTAwMWJnXHUwMDFiRzE7XHUwMDFiSDE7RXJyb3JcdTAwMWJoOiBubyBtb3JlIGVycm9yIGhhbmRsZXJzIGF2YWlsYWJsZSAocmVjdXJzaXZlIGVycm9ycz8pOyBpbnZva2luZyAnYWJvcnQnIHJlc3RhcnRcblx1MDAxYmdcbiJ9 -->
+<pre><code>G1;H1;Errorh in geom_plot() : could not find function &quot;geom_plot&quot;
+Error during wrapup: not that many frames on the stack
+gG1;H1;Errorh: no more error handlers available (recursive errors?); invoking &#39;abort&#39; restart
+g</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCiNsb2FkIGluIHBhY2thZ2VzDQpsaWJyYXJ5KHRlcnJhKQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KHRpZHl0ZXJyYSkNCmxpYnJhcnkoc2YpDQpgYGANCg0KYGBge3J9DQojIHVwbG9hZCByYXN0ZXIgZmlsZXMNCndiZ3RfZmlsZXMgPC0gbGlzdC5maWxlcygifi9HbG9iYWwgQ2hhbmdlIEdlb2dyYXBoeSBNU2MvU29TZSAyNS9BcHBsaWVkIEdlb2luZm9ybWF0aW9uIFNjaWVuY2UvQmxvY2syL2NsaW1hdGUtbW9kZWwtb3V0cHV0IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICBwYXR0ZXJuID0gIl5XQkdUX2RheW92ZXIyOC4qXFwudGlmJCIsDQogICAgICAgICAgICAgICAgICAgICAgICAgZnVsbC5uYW1lcyA9IFQpDQoNCiMgY3JlYXRlIHJhc3RlciBzdGFjaw0Kd2JndF9zdGFjayA8LSByYXN0KHdiZ3RfZmlsZXMpDQoNCiMgcmVuYW1lIGxheWVyDQp3Ymd0X25hbWVzIDwtIG5hbWVzKHdiZ3Rfc3RhY2spDQoNCndiZ3RfbmFtZXMgPC0gc2FwcGx5KHdiZ3RfbmFtZXMsIGZ1bmN0aW9uKG5hbWUpeyANCiAgbmFtZSA8LSBnc3ViKCJeV0JHVF9kYXlvdmVyMjhfIiwgIiIsIG5hbWUpDQogIHJldHVybihuYW1lKQ0KfSkNCg0KbmFtZXMod2JndF9zdGFjaykgPC0gd2JndF9uYW1lcw0KDQojIGNyZWF0ZSBkYXRhIGZyYW1lDQp3Ymd0X2RmIDwtIHdiZ3Rfc3RhY2sgJT4lDQogIGFzLmRhdGEuZnJhbWUoeHkgPSBUKQ0KDQojIHRpZHkgZGYNCndiZ3RfZGYgPC0gd2JndF9kZiAlPiUNCiAgcGl2b3RfbG9uZ2VyKGNvbHMgPSAtYygieCIsICJ5IiksIA0KICAgICAgICAgICAgICAgbmFtZXNfdG8gPSAiZGF0ZSIsDQogICAgICAgICAgICAgICB2YWx1ZXNfdG8gPSAid2V0X2J1bGJfdGVtcCIpDQojIGdlbmVyYXRlIHBsb3QNCndiZ3RfZGYgJT4lDQogIGdyb3VwX2J5KGRhdGUpICU+JQ0KICBzdW1tYXJpemUobWVhbl93Ymd0ID0gbWVhbih3ZXRfYnVsYl90ZW1wKSkgJT4lDQogIGdncGxvdChhZXMoeCA9IGRhdGUsIHkgPSBtZWFuX3diZ3QpKSArDQogIGdlb21fcG9pbnQoKSArDQogIHRoZW1lX2J3KCkNCmBgYA0KDQpgYGB7cn0NCiMgbGlzdCB0Mm0gZGFpbHkgbWVhbiBmaWxlcw0KdDJtX2RhaWx5bWVhbl9maWxlcyA8LSBsaXN0LmZpbGVzKCJ+L0dsb2JhbCBDaGFuZ2UgR2VvZ3JhcGh5IE1TYy9Tb1NlIDI1L0FwcGxpZWQgR2VvaW5mb3JtYXRpb24gU2NpZW5jZS9CbG9jazIvY2xpbWF0ZS1tb2RlbC1vdXRwdXQiLA0KICAgICAgICAgICAgICAgICAgICAgICAgcGF0dGVybiA9ICJeVDJNX2RhaWx5X21lYW5fbWF4X3RvcG9ncmFwaHkuKlxcLnRpZiQiLA0KICAgICAgICAgICAgICAgICAgICAgICAgZnVsbC5uYW1lcyA9IFQpDQojIGNyZWF0ZSByYXN0ZXIgc3RhY2sNCnQybV9kYWlseW1lYW5fc3RhY2sgPC0gcmFzdCh0Mm1fZmlsZXMpDQpgYGANCg0KYGBge3J9DQojIGxpc3QgdDJtIG5pZ2h0b3ZlcjIwIGZpbGVzDQp0Mm1fbmlnaHRvdmVyMjBfZmlsZXMgPC0gbGlzdC5maWxlcygifi9HbG9iYWwgQ2hhbmdlIEdlb2dyYXBoeSBNU2MvU29TZSAyNS9BcHBsaWVkIEdlb2luZm9ybWF0aW9uIFNjaWVuY2UvQmxvY2syL2NsaW1hdGUtbW9kZWwtb3V0cHV0IiwNCiAgICAgICAgICAgICAgICAgICAgICAgIHBhdHRlcm4gPSAiXlQyTV9uaWdodG92ZXIyMC4qXFwudGlmJCIsDQogICAgICAgICAgICAgICAgICAgICAgICBmdWxsLm5hbWVzID0gVCkNCg0KIyBjcmVhdGUgcmFzdGVyIHN0YWNrDQp0Mm1fbmlnaHRvdmVyMjBfc3RhY2sgPC0gcmFzdCh0Mm1fbmlnaHRvdmVyMjBfZmlsZXMpDQoNCiMgcmVuYW1lIHJhc3RlciBsYXllcnMNCnQybV9uaWdodG92ZXIyMF9uYW1lcyA8LSBuYW1lcyh0Mm1fbmlnaHRvdmVyMjBfc3RhY2spDQoNCnQybV9uaWdodG92ZXIyMF9uYW1lcyA8LSBzYXBwbHkodDJtX25pZ2h0b3ZlcjIwX25hbWVzLCBmdW5jdGlvbihuYW1lKXsNCiAgbmFtZSA8LSBnc3ViKCJeVDJNX25pZ2h0b3ZlcjIwXyIsICIiLCBuYW1lKQ0KICByZXR1cm4obmFtZSkNCn0pDQoNCm5hbWVzKHQybV9uaWdodG92ZXIyMF9zdGFjaykgPC0gdDJtX25pZ2h0b3ZlcjIwX25hbWVzDQoNCiMgY3JlYXRlIGRmDQp0Mm1fbmlnaHRvdmVyMjBfZGYgPC0gdDJtX25pZ2h0b3ZlcjIwX3N0YWNrICU+JQ0KICBhcy5kYXRhLmZyYW1lKHh5ID0gVCkNCg0KIyB0aWR5IGRmDQp0Mm1fbmlnaHRvdmVyMjBfZGYgPC0gdDJtX25pZ2h0b3ZlcjIwX2RmICU+JQ0KICBwaXZvdF9sb25nZXIoY29scyA9IC1jKHgsIHkpLCBuYW1lc190byA9ICJwcm9qZWN0aW9uIiwgdmFsdWVzX3RvID0gInQybSIpIA0KDQojIyBHUkVQTCBPUEVSQVRJT04NCg0KIyBtdXRhdGUgZHVyYXRpb24gdmFyaWFibGUNCnQybV9uaWdodG92ZXIyMF9kZiA8LSB0Mm1fbmlnaHRvdmVyMjBfZGYgJT4lDQogIG11dGF0ZShkdXJhdGlvbiA9IGNhc2Vfd2hlbihncmVwbCgiMjA0MV8yMDUwIiwgcHJvamVjdGlvbikgfiAiMjA0MV8yMDUwIiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdyZXBsKCIyMDkxXzIxMDAiLCBwcm9qZWN0aW9uKSB+ICIyMDkxXzIxMDAiKSkNCg0KIyBtdXRhdGUgc2NlbmFyaW8gdmFyaWFibGUNCnQybV9uaWdodG92ZXIyMF9kZiA8LSB0Mm1fbmlnaHRvdmVyMjBfZGYgJT4lDQogIG11dGF0ZShzY2VuYXJpbyA9IGNhc2Vfd2hlbihncmVwbCgiR1MiLCBwcm9qZWN0aW9uKSB+ICJHUyIsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBncmVwbCgiQ3VyUG9sIiwgcHJvamVjdGlvbikgfiAiQ3VyUG9sIikpDQoNCiMgbXV0YXRlIGVuc2VtYmxlIHZhcmlhYmxlDQp0Mm1fbmlnaHRvdmVyMjBfZGYgPC0gdDJtX25pZ2h0b3ZlcjIwX2RmICU+JQ0KICBtdXRhdGUoZW5zZW1ibGUgPSBjYXNlX3doZW4oZ3JlcGwoImVuc21lYW4iLCBwcm9qZWN0aW9uKSB+ICJlbnNtZWFuIiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdyZXBsKCJlbnNwY3RsMDUiLCBwcm9qZWN0aW9uKSB+ICIwNSIsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBncmVwbCgiZW5zcGN0bDk1IiwgcHJvamVjdGlvbikgfiAiOTUiKSkgJT4lDQogIHNlbGVjdCgtYyh4LHkpKQ0KDQpgYGANCg0KYGBge3J9DQojIGNyZWF0ZSBoYXBoYXphcmQgc2FtcGxlIGZvciBlYXNpZXIgY29tcHV0aW5nDQp0Mm1fc2FtcGxlIDwtIHQybV9uaWdodG92ZXIyMF9kZltzYW1wbGUoMTpucm93KHQybV9uaWdodG92ZXIyMF9kZiksIDUwMDAwKSwgXQ0KDQpgYGA=</div>
 
 
 
